@@ -15,6 +15,7 @@ def test2():
            [False, True, True, False, True, True], [False, True, True, True, False, False],
            [False, True, False, False, False, True]]
     b = b and (rh.free_pos[i, j] == ans[i, j] for i in range(6) for j in range(6))
+    # Verifier manuellement que le test fonctionne car cette ligne print toujours que le test est correct
     print("\n", "résultat correct" if b else "mauvais résultat")
 
 
