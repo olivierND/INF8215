@@ -28,13 +28,18 @@ class State:
 
     def move(self, c, d):
         # TODO
-        return None
+        s = State(self.pos)
+        s.c = c
+        s.prev = self
+        s.d = d
+        s.pos[c] = s.pos[c] + d
+        return s
 
     """ est il final? """
 
     def success(self):
         # TODO
-        return False
+        return True if self.pos[0] == 4 else False
 
     """
     Estimation du nombre de coup restants 
