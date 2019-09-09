@@ -27,7 +27,6 @@ class State:
     """
 
     def move(self, c, d):
-        # TODO
         s = State(self.pos)
         s.c = c
         s.prev = self
@@ -38,7 +37,6 @@ class State:
     """ est il final? """
 
     def success(self):
-        # TODO
         return True if self.pos[0] == 4 else False
 
     """
