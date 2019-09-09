@@ -1,6 +1,7 @@
 import numpy as np
 from collections import deque
 import heapq
+from State import State
 
 
 class Rushhour:
@@ -16,22 +17,23 @@ class Rushhour:
 
     def init_positions(self, state):
         self.free_pos = np.ones((6, 6), dtype=bool)
-
         for i in range(0, len(state.pos)):
             if self.horiz[i]:
-                second_index = state.pos[i]
-                first_index = self.move_on[i]
                 for j in range(0, self.length[i]):
-                    self.free_pos[first_index][second_index+j] = False
+                    self.free_pos[self.move_on[i]][state.pos[i]+j] = False
             else:
-                second_index = self.move_on[i]
-                first_index = state.pos[i]
                 for j in range(0, self.length[i]):
-                    self.free_pos[first_index+j][second_index] = False
+                    self.free_pos[state.pos[i]+j][self.move_on[i]] = False
 
     def possible_moves(self, state):
-        self.init_positions(state)
         new_states = []
+        self.init_positions(state)
+        for i in range(0, len(state.pos)):
+            if self.horiz[i]:
+                if not self.free_pos[self.move_on[i]][state.pos[i]-1]:
+                    new_states += State()
+
+
         # TODO
         return new_states
 
