@@ -29,12 +29,13 @@ class Rushhour:
         new_states = []
         self.init_positions(state)
         for i in range(0, len(state.pos)):
-            if self.horiz[i]:
-                if not self.free_pos[self.move_on[i]][state.pos[i]-1]:
-                    new_states += State()
+            if state.pos[i]-1 >= 0 and (self.free_pos[self.move_on[i]][state.pos[i]-1] or self.free_pos[state.pos[i]-1][self.move_on[i]]):
+                new_state = State(state.pos)
+                new_states.append(new_state.move(i, -1))
+            if state.pos[i]+1 < 6 and (self.free_pos[self.move_on[i]][state.pos[i]+1] or self.free_pos[state.pos[i]+1][self.move_on[i]]):
+                new_state = State(state.pos)
+                new_states.append(new_state.move(i, 1))
 
-
-        # TODO
         return new_states
 
     def solve(self, state):
