@@ -41,8 +41,18 @@ class Rushhour:
     def solve(self, state):
         visited = set()
         fifo = deque([state])
-        visited.add(state)
-        # TODO
+        while len(fifo) > 0:
+            current_state = fifo.popleft()
+
+            if current_state not in visited:
+                if current_state.success():
+                    return current_state
+
+                visited.add(current_state)
+                new_states = self.possible_moves(current_state)
+                for next_state in new_states:
+                    if next_state not in visited:
+                        fifo.append(next_state)
 
         return None
 
