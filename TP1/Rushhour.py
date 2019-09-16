@@ -7,35 +7,42 @@ from State import State
 class Rushhour:
 
     def __init__(self, horiz, length, move_on, color=None):
-        self.nbcars = len(horiz)
+        self.nbcars = len(horiz) # le nombre de voitures dans la grille;
         self.horiz = horiz
-        self.length = length
-        self.move_on = move_on
+        self.length = length # un vecteur contenant la longueur de chaque voiture (2 ou 3);
+        self.move_on = move_on # un vecteur contenant le numéro de la ligne ou la colonne où se trouve la voiture (0-5);
         self.color = color
 
         self.free_pos = None
 
     def init_positions(self, state):
         self.free_pos = np.ones((6, 6), dtype=bool)
-        for i in range(0, len(state.pos)):
+        for i in range(len(state.pos)):
             if self.horiz[i]:
-                for j in range(0, self.length[i]):
+                for j in range(self.length[i]):
                     self.free_pos[self.move_on[i]][state.pos[i]+j] = False
             else:
-                for j in range(0, self.length[i]):
+                for j in range(self.length[i]):
                     self.free_pos[state.pos[i]+j][self.move_on[i]] = False
 
     def possible_moves(self, state):
         new_states = []
         self.init_positions(state)
-        for i in range(0, len(state.pos)):
-            if state.pos[i]-1 >= 0 and (self.free_pos[self.move_on[i]][state.pos[i]-1] or self.free_pos[state.pos[i]-1][self.move_on[i]]):
-                new_state = State(state.pos)
-                new_states.append(new_state.move(i, -1))
-            if state.pos[i]+1 < 6 and (self.free_pos[self.move_on[i]][state.pos[i]+1] or self.free_pos[state.pos[i]+1][self.move_on[i]]):
-                new_state = State(state.pos)
-                new_states.append(new_state.move(i, 1))
-
+        for i in range(len(state.pos)):
+            if self.horiz[i]:
+                if state.pos[i] > 0 and self.free_pos[self.move_on[i]][state.pos[i] - 1]:
+                    new_state = State(state.pos)
+                    new_states.append(new_state.move(i, -1))
+                if state.pos[i] + self.length[i] < 6 and self.free_pos[self.move_on[i]][state.pos[i] + self.length[i]]:
+                    new_state = State(state.pos)
+                    new_states.append(new_state.move(i, 1))
+            else:
+                if state.pos[i] > 0 and self.free_pos[state.pos[i]-1][self.move_on[i]]:
+                    new_state = State(state.pos)
+                    new_states.append(new_state.move(i, -1))
+                if state.pos[i] + self.length[i] < 6 and self.free_pos[state.pos[i] + self.length[i]][self.move_on[i]]:
+                    new_state = State(state.pos)
+                    new_states.append(new_state.move(i, 1))
         return new_states
 
     def solve(self, state):
@@ -68,5 +75,23 @@ class Rushhour:
         return None
 
     def print_solution(self, state):
-        # TODO
+        i = 1
+        fifo = deque([state])
+        while state.prev is not None:
+            output = str(i) + ". Voiture " + self.color[state.c] + " vers "
+
+            if self.horiz[state.c]:
+                if state.d > 0:
+                    output += "la gauche."
+                else:
+                    output += "la droite."
+            else:
+                if state.d > 0:
+                    output += "le bas."
+                else:
+                    output += "le haut."
+
+            print(output)
+            i += 1
+            state = state.prev
         return 0
