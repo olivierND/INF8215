@@ -7,10 +7,19 @@ from State import State
 class Rushhour:
 
     def __init__(self, horiz, length, move_on, color=None):
-        self.nbcars = len(horiz) # le nombre de voitures dans la grille;
+        # Le nombre de voitures dans la grille;
+        self.nbcars = len(horiz)
+
+        # Si la voiture est horizontale
         self.horiz = horiz
-        self.length = length # un vecteur contenant la longueur de chaque voiture (2 ou 3);
-        self.move_on = move_on # un vecteur contenant le numéro de la ligne ou la colonne où se trouve la voiture (0-5);
+
+        # Un vecteur contenant la longueur de chaque voiture (2 ou 3);
+        self.length = length
+
+        # Un vecteur contenant le numéro de la ligne ou la colonne où se trouve la voiture (0-5);
+        self.move_on = move_on
+
+        # Couleur
         self.color = color
 
         self.free_pos = None
@@ -20,9 +29,11 @@ class Rushhour:
         for i in range(len(state.pos)):
             if self.horiz[i]:
                 for j in range(self.length[i]):
+                    # Row reste toujours cst, +j pour ajouter le length de l'auto
                     self.free_pos[self.move_on[i]][state.pos[i]+j] = False
             else:
                 for j in range(self.length[i]):
+                    # Column reste toujours cst, +j pour ajouter le length de l'auto
                     self.free_pos[state.pos[i]+j][self.move_on[i]] = False
 
     def possible_moves(self, state):
@@ -30,13 +41,17 @@ class Rushhour:
         self.init_positions(state)
         for i in range(len(state.pos)):
             if self.horiz[i]:
+                # Regarder pour reculer (vers la gauche)
                 if state.pos[i] > 0 and self.free_pos[self.move_on[i]][state.pos[i] - 1]:
                     new_states.append(state.move(i, -1))
+                # Regarder pour avancer (vers la droite)
                 if state.pos[i] + self.length[i] < 6 and self.free_pos[self.move_on[i]][state.pos[i] + self.length[i]]:
                     new_states.append(state.move(i, 1))
             else:
+                # Regarder pour reculer (vers le bas)
                 if state.pos[i] > 0 and self.free_pos[state.pos[i]-1][self.move_on[i]]:
                     new_states.append(state.move(i, -1))
+                # Regarder pour avancer (vers le haut)
                 if state.pos[i] + self.length[i] < 6 and self.free_pos[state.pos[i] + self.length[i]][self.move_on[i]]:
                     new_states.append(state.move(i, 1))
         return new_states
