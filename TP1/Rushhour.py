@@ -31,18 +31,14 @@ class Rushhour:
         for i in range(len(state.pos)):
             if self.horiz[i]:
                 if state.pos[i] > 0 and self.free_pos[self.move_on[i]][state.pos[i] - 1]:
-                    new_state = State(state.pos)
-                    new_states.append(new_state.move(i, -1))
+                    new_states.append(state.move(i, -1))
                 if state.pos[i] + self.length[i] < 6 and self.free_pos[self.move_on[i]][state.pos[i] + self.length[i]]:
-                    new_state = State(state.pos)
-                    new_states.append(new_state.move(i, 1))
+                    new_states.append(state.move(i, 1))
             else:
                 if state.pos[i] > 0 and self.free_pos[state.pos[i]-1][self.move_on[i]]:
-                    new_state = State(state.pos)
-                    new_states.append(new_state.move(i, -1))
+                    new_states.append(state.move(i, -1))
                 if state.pos[i] + self.length[i] < 6 and self.free_pos[state.pos[i] + self.length[i]][self.move_on[i]]:
-                    new_state = State(state.pos)
-                    new_states.append(new_state.move(i, 1))
+                    new_states.append(state.move(i, 1))
         return new_states
 
     def solve(self, state):
