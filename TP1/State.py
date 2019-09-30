@@ -31,21 +31,21 @@ class State:
         s.c = c
         s.prev = self
         s.d = d
+        s.nb_moves = self.nb_moves + 1
         s.pos[c] = s.pos[c] + d
         return s
 
     """ est il final? """
 
     def success(self):
-        return True if self.pos[0] == 4 else False
+        return self.pos[0] == 4
 
     """
     Estimation du nombre de coup restants 
     """
 
     def estimee1(self):
-        # TODO
-        return 0
+        return 4 - self.pos[0]
 
     def estimee2(self, rh):
         # TODO
