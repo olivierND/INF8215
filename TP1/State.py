@@ -52,7 +52,13 @@ class State:
         return self.estimee1() + self.get_cars_between_red_and_exit(rh)
 
     def get_cars_between_red_and_exit(self, rh):
-        return 0
+        k = 0
+        for i in range(len(self.pos)):
+            if not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1:
+                for j in range(rh.length[i]):
+                    if self.pos[i] + j == 2:
+                        k = k + 1
+        return k
 
     def __eq__(self, other):
         if not isinstance(other, State):

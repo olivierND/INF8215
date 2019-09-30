@@ -8,9 +8,11 @@ def solve46():
                  [2, 2, 0, 0, 3, 1, 1, 3, 0, 4, 5, 5],
                  ["rouge", "vert clair", "jaune", "orange", "violet clair", "bleu ciel", "rose", "violet", "vert", "noir", "beige", "bleu"])
     s = State([1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1])
-    s = rh.solve(s)
-    #s = rh.solve_Astar(s)
-    rh.print_solution(s)
+    s1 = rh.solve(s)
+    rh.print_solution(s1)
+    print("\n")
+    s2 = rh.solve_Astar(s)
+    rh.print_solution(s2)
 solve46()
 print("\n--------------------------------------------\n")
 # %time

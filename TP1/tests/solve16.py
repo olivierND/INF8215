@@ -8,8 +8,8 @@ def solve16():
                  [2, 0, 0, 0, 5, 4, 5, 3],
                  ["rouge", "vert clair", "violet", "orange", "vert", "bleu ciel", "jaune", "bleu"])
     s = State([1, 0, 1, 4, 2, 4, 0, 1])
-    s = rh.solve(s)
-    #s = rh.solve_Astar(s)
+    #s = rh.solve(s)
+    s = rh.solve_Astar(s)
     n = rh.print_solution(s)
 
 

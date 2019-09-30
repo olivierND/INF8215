@@ -96,8 +96,8 @@ class Rushhour:
                 visited.add(current_state)
                 new_states = self.possible_moves(current_state)
                 for next_state in new_states:
-                    next_state.h = next_state.estimee1()
                     if next_state not in visited:
+                        next_state.h = next_state.estimee2(self)
                         heapq.heappush(priority_queue, next_state)
         return None
 
