@@ -62,9 +62,9 @@ class Rushhour:
         fifo = deque([state])
         while len(fifo) > 0:
             current_state = fifo.popleft()
-            i = i + 1
 
             if current_state not in visited:
+                i = i + 1
                 if current_state.success():
                     print(str(i) + " nombres d'états visités")
                     return current_state
@@ -86,8 +86,9 @@ class Rushhour:
 
         while len(priority_queue) > 0:
             current_state = heapq.heappop(priority_queue)
-            i = i + 1
+
             if current_state not in visited:
+                i = i + 1
                 if current_state.success():
                     print(str(i) + " nombres d'états visités")
                     return current_state
@@ -95,6 +96,7 @@ class Rushhour:
                 visited.add(current_state)
                 new_states = self.possible_moves(current_state)
                 for next_state in new_states:
+                    next_state.h = next_state.estimee1()
                     if next_state not in visited:
                         heapq.heappush(priority_queue, next_state)
         return None

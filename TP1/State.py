@@ -33,6 +33,7 @@ class State:
         s.d = d
         s.nb_moves = self.nb_moves + 1
         s.pos[c] = s.pos[c] + d
+        # s.h = s.estimee1()
         return s
 
     """ est il final? """
@@ -48,7 +49,9 @@ class State:
         return 4 - self.pos[0]
 
     def estimee2(self, rh):
+        return self.estimee1() + self.get_cars_between_red_and_exit(rh)
 
+    def get_cars_between_red_and_exit(self, rh):
         return 0
 
     def __eq__(self, other):
