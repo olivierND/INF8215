@@ -66,6 +66,7 @@ class Rushhour:
 
             if current_state not in visited:
                 if current_state.success():
+                    print(str(i) + " nombres d'états visités")
                     return current_state
 
                 visited.add(current_state)
@@ -73,13 +74,11 @@ class Rushhour:
                 for next_state in new_states:
                     if next_state not in visited:
                         fifo.append(next_state)
-        print(str(i) + " nombres d'états visités")
         return None
 
     def solve_Astar(self, state):
         i = 0
         visited = set()
-        visited.add(state)
 
         priority_queue = []
         state.h = state.estimee1()
@@ -90,15 +89,14 @@ class Rushhour:
             i = i + 1
             if current_state not in visited:
                 if current_state.success():
+                    print(str(i) + " nombres d'états visités")
                     return current_state
 
                 visited.add(current_state)
                 new_states = self.possible_moves(current_state)
                 for next_state in new_states:
                     if next_state not in visited:
-
                         heapq.heappush(priority_queue, next_state)
-        print(str(i) + " nombres d'états visités")
         return None
 
     def print_solution(self, state):

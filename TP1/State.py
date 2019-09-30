@@ -48,7 +48,7 @@ class State:
         return 4 - self.pos[0]
 
     def estimee2(self, rh):
-        # TODO
+
         return 0
 
     def __eq__(self, other):
