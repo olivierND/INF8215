@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Rushhour:
 
     def __init__(self, horiz, length, move_on, color=None):
@@ -16,7 +19,9 @@ class Rushhour:
                 self.free_pos[self.move_on[i], state.pos[i]:state.pos[i] + self.length[i]] = False
             else:
                 self.free_pos[state.pos[i]:state.pos[i] + self.length[i], self.move_on[i]] = False
-        # TODO
+
+        if state.rock is not None:
+            self.free_pos[state.rock[0]][state.rock[1]] = False
 
     def possible_moves(self, state):
         self.init_positions(state)
@@ -39,7 +44,14 @@ class Rushhour:
     def possible_rock_moves(self, state):
         self.init_positions(state)
         new_states = []
-        # TODO
+
+        for i in range(6):
+            for j in range(6):
+                if state.rock is None and self.free_pos[i][j] and i != 2:
+                    new_states.append(state.put_rock((i, j)))
+                elif state.rock is not None and self.free_pos[i][j] and i != 2 and i != state.rock[0] and j != state.rock[1]:
+                    new_states.append(state.put_rock((i, j)))
+
         return new_states
 
     def print_pretty_grid(self, state):

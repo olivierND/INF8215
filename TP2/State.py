@@ -42,7 +42,11 @@ class State:
 
     def put_rock(self, rock_pos):
         # TODO
-        return None
+        s = State(self.pos)
+        s.prev = self
+
+        s.rock = rock_pos
+        return s
 
     def score_state(self):
         # TODO

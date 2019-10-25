@@ -10,7 +10,7 @@ def testPossibleRockMoves():
     s = State([1, 0, 3, 1, 1, 4, 3, 4, 4, 2, 4, 1])
     sols = rh.possible_rock_moves(s)
     print(len(sols))
-    s1 = s.put_rock((3,4))
+    s1 = s.put_rock((3, 4))
     sols = rh.possible_rock_moves(s1)
     print(len(sols))
 
