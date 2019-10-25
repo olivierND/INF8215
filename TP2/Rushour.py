@@ -47,8 +47,10 @@ class Rushhour:
 
         for i in range(6):
             for j in range(6):
+                # S'il n'y a pas encore de rock, on ne vérifie pas la condition pour la ligne/colonne de la roche précédente
                 if state.rock is None and self.free_pos[i][j] and i != 2:
                     new_states.append(state.put_rock((i, j)))
+                # Si on a une roche précédente, on vérifie sont numéro de ligne et colonne
                 elif state.rock is not None and self.free_pos[i][j] and i != 2 and i != state.rock[0] and j != state.rock[1]:
                     new_states.append(state.put_rock((i, j)))
 

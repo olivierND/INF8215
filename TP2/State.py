@@ -48,9 +48,40 @@ class State:
         s.rock = rock_pos
         return s
 
-    def score_state(self):
-        # TODO
-        return None
+    # Pour cette heuristique, on vérifie pour chaque auto bloquant l'auto rouge, si elles sont aussi bloquées par
+    # d'autres autos sur le jeu ou par une roche. Ainsi, on ajoute soit 1 au compteur si l'auto est bloquée par
+    # seulement une autre auto ou roche par en haut ou par en bas, soit 2 au compteur si l'auto est bloquée des deux
+    # côtés et ne peut donc pas bouger.
+    def score_state(self, rh):
+        k = 0
+        for i in range(len(self.pos)):
+            if not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1:
+                for j in range(rh.length[i]):
+                    if self.pos[i] + j == 2:
+                        d = self.is_car_blocked(rh, i)
+                        k += 1 + d
+        return self.estimee1() + k
+
+    # Fonction qui vérifie si l'auto bloquante est elle-même bloquée par 1 ou 2 autos ou roche en verticale
+    # ou en horizontale.
+    def is_car_blocked(self, rh, car_index):
+        k = 0
+        for i in range(len(self.pos)):
+            if rh.horiz[i]:
+                if rh.move_on[i] == self.pos[car_index] + rh.length[car_index]:
+                    k += 1
+                if rh.move_on[i] == self.pos[car_index] - 1:
+                    k += 1
+            else:
+                if rh.move_on[car_index] == rh.move_on[i]:
+                    if self.pos[i] == self.pos[car_index] + rh.length[car_index]:
+                        k += 1
+                    if self.pos[i] + rh.length[car_index] - 1 == self.pos[car_index] - 1:
+                        k += 1
+        return k
+
+    def estimee1(self):
+        return 4 - self.pos[0]
 
     def success(self):
         return self.pos[0] == 4
