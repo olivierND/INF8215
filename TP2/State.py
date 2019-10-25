@@ -48,40 +48,69 @@ class State:
         s.rock = rock_pos
         return s
 
-    # Pour cette heuristique, on vérifie pour chaque auto bloquant l'auto rouge, si elles sont aussi bloquées par
-    # d'autres autos sur le jeu ou par une roche. Ainsi, on ajoute soit 1 au compteur si l'auto est bloquée par
-    # seulement une autre auto ou roche par en haut ou par en bas, soit 2 au compteur si l'auto est bloquée des deux
-    # côtés et ne peut donc pas bouger.
+    # Si une auto bloque directement l'auto rouge: score -= 1
+    # Si une auto ou une roche bloque une auto qui elle bloque l'auto rouge : score -= 1
+    # Si une auto qui bloque l'auto rouge n'est pas bloquée par une autre auto ou roche : score += 1
     def score_state(self, rh):
-        k = 0
+        score = 0
         for i in range(len(self.pos)):
             if not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1:
                 for j in range(rh.length[i]):
                     if self.pos[i] + j == 2:
-                        d = self.is_car_blocked(rh, i)
-                        k += 1 + d
-        return self.estimee1() + k
+                        score -= 1
+                        d = self.is_car_blocked_by_car(rh, i)
+                        score += d
+        return self.score_sortie() + score
 
     # Fonction qui vérifie si l'auto bloquante est elle-même bloquée par 1 ou 2 autos ou roche en verticale
     # ou en horizontale.
-    def is_car_blocked(self, rh, car_index):
+    def is_car_blocked_by_car(self, rh, car_index):
         k = 0
         for i in range(len(self.pos)):
             if rh.horiz[i]:
                 if rh.move_on[i] == self.pos[car_index] + rh.length[car_index]:
+                    k -= 1
+                else:
                     k += 1
                 if rh.move_on[i] == self.pos[car_index] - 1:
+                    k -= 1
+                else:
                     k += 1
             else:
                 if rh.move_on[car_index] == rh.move_on[i]:
                     if self.pos[i] == self.pos[car_index] + rh.length[car_index]:
+                        k -= 1
+                    else:
                         k += 1
                     if self.pos[i] + rh.length[car_index] - 1 == self.pos[car_index] - 1:
+                        k -= 1
+                    else:
                         k += 1
+        return k + self.is_car_blocked_by_rock(rh, car_index)
+
+    def is_car_blocked_by_rock(self, rh, car_index):
+        k = 0
+        if rh.horiz[car_index]:
+            # La roche est en arriere ou en avant de l'auto
+            if (self.rock[0] == rh.move_on[car_index] and self.rock[1] == self.pos[car_index] - 1) \
+                or (self.rock[0] == rh.move_on[car_index] and self.rock[1] == self.pos[car_index] + rh.length[car_index]):
+                k -= 1
+        else:
+            # La roche est a gauche ou a droite de l'auto
+            if (self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] - 1) \
+                or (self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] + rh.length[car_index]):
+                k -= 1
+        if k == 0:
+            return 1
+
         return k
 
-    def estimee1(self):
-        return 4 - self.pos[0]
+    # +1 si l'auto rouge se rapproche de la sortie, -1 si elle s'éloigne
+    def score_sortie(self):
+        if self.prev is not None:
+            return self.pos[0] - self.prev.pos[0]
+        else:
+            return 0
 
     def success(self):
         return self.pos[0] == 4
