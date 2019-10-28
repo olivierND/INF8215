@@ -97,8 +97,8 @@ class State:
                 k -= 1
         else:
             # La roche est a gauche ou a droite de l'auto
-            if (self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] - 1) \
-                or (self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] + rh.length[car_index]):
+            if (self.rock is not None and self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] - 1) \
+                or (self.rock is not None and self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] + rh.length[car_index]):
                 k -= 1
         if k == 0:
             return 1
