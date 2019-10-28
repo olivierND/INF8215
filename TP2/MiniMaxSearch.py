@@ -9,15 +9,14 @@ class MiniMaxSearch:
 
     def minimax_1(self, current_depth, current_state):
         # TODO
-        if current_state.success():
-            return current_state
+        possible_moves = self.rushhour.possible_moves(current_state)
 
-        possible_moves = self.rushhour.possible_moves(self.state)
-        best_move = self.get_best_state(possible_moves)
-        self.state = best_move
+        if current_depth == self.search_depth:
+            best_move = self.get_best_state(possible_moves)
+            return best_move
 
-        if current_depth < self.search_depth:
-            best_move = self.minimax_1(current_depth + 1, best_move)
+        for s in possible_moves:
+            best_move = self.minimax_1(current_depth + 1, s)
 
         return best_move
 
@@ -63,8 +62,10 @@ class MiniMaxSearch:
         if state.success():
             return state
 
+        self.state = state
         if is_singleplayer:
-            self.minimax_1(1, state)
+            while not self.state.success():
+                self.state = self.minimax_1(1, self.state)
             self.print_move(False, self.state)
         else:
             self.minimax_2(0, state, False)
