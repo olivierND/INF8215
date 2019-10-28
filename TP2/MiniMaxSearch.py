@@ -6,12 +6,14 @@ class MiniMaxSearch:
         self.rushhour = rushHour
         self.state = initial_state
         self.search_depth = search_depth
+        self.visited = set()
 
     def minimax_1(self, current_depth, current_state):
         possible_moves = self.rushhour.possible_moves(current_state)
 
         if current_depth == self.search_depth:
             best_move = self.get_best_state(possible_moves)
+            self.visited.add(best_move)
             return best_move
 
         for s in possible_moves:
@@ -23,10 +25,14 @@ class MiniMaxSearch:
         best_state = None
         for s in possible_moves:
             s.score = s.score_state(self.rushhour)
+            if s in self.visited:
+                s.score -= 1
+
             if best_state is None:
                 best_state = s
             elif s.score > best_state.score:
                 best_state = s
+
 
         return best_state
 
