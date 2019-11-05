@@ -52,21 +52,89 @@ class State:
     # Si une auto ou une roche bloque une auto qui elle bloque l'auto rouge : score -= 1
     # Si une auto qui bloque l'auto rouge n'est pas bloquée par une autre auto ou roche : score += 1
     def score_state(self, rh):
-        if self.success() or self.is_closer_to_exit():
+        score = 0
+
+        if self.success():
             return 1000
 
-        if self.is_further_to_exit():
-            return -1000
+        if self.is_closer_to_exit():
+            score += 10
 
-        score = 0
+        if self.is_further_to_exit():
+            score -= 10
+
         for i in range(len(self.pos)):
-            if not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1:
-                for j in range(rh.length[i]):
-                    if self.pos[i] + j == 2:
-                        score -= 1
-                        # d = self.is_car_blocked_by_car(rh, i)
-                        # score += d
+            if not self.is_previous_in_red_cars_way(rh, i) and self.is_current_in_red_cars_way(rh, i):
+                score -= 5
+            elif self.is_previous_in_red_cars_way(rh, i) and not self.is_current_in_red_cars_way(rh, i):
+                score += 5
+
+            if self.is_truck_getting_out_of_red_cars_way(rh, i):
+                score += 5
+            elif self.is_truck_getting_in_red_cars_way(rh, i):
+                score -= 5
+
+            if not self.previous_blocks_car_thats_in_red_cars_way(rh, i) \
+                    and self.current_blocks_car_thats_in_red_cars_way(rh, i):
+                score -= 5
+            elif self.previous_blocks_car_thats_in_red_cars_way(rh, i) \
+                    and not self.current_blocks_car_thats_in_red_cars_way(rh, i):
+                score += 5
+
         return score
+
+    def is_current_in_red_cars_way(self, rh, i):
+        if not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1:
+            for j in range(rh.length[i]):
+                if self.pos[i] + j == 2:
+                    return True
+        return False
+
+    def is_previous_in_red_cars_way(self, rh, i):
+        if self.prev is not None and not rh.horiz[i] and rh.move_on[i] > self.prev.pos[0] + 1:
+            for j in range(rh.length[i]):
+                if self.prev is not None and self.prev.pos[i] + j == 2:
+                    return True
+        return False
+
+    def is_truck_getting_out_of_red_cars_way(self, rh, i):
+        return self.prev is not None and not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1 \
+               and rh.length[i] == 3 and self.pos[i] > self.prev.pos[i]
+
+    def is_truck_getting_in_red_cars_way(self, rh, i):
+        return self.prev is not None and not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1 \
+               and rh.length[i] == 3 and self.pos[i] < self.prev.pos[i]
+
+    def current_blocks_car_thats_in_red_cars_way(self, rh, i):
+        if self.is_current_in_red_cars_way(rh, i):
+            for j in range(len(self.pos)):
+                if rh.horiz[j]:
+                    if rh.move_on[j] == self.pos[i] + rh.length[i]:
+                        for k in range(rh.length[j]):
+                            if self.pos[j] + k == rh.move_on[i]:
+                                return True
+
+                    if rh.move_on[j] == self.pos[i] - 1:
+                        for k in range(rh.length[j]):
+                            if self.pos[j] + k == rh.move_on[i]:
+                                return True
+        return False
+
+    def previous_blocks_car_thats_in_red_cars_way(self, rh, i):
+        if self.is_previous_in_red_cars_way(rh, i):
+            for j in range(len(self.prev.pos)):
+                if rh.horiz[j]:
+                    if rh.move_on[j] == self.prev.pos[i] + rh.length[i]:
+                        for k in range(rh.length[j]):
+                            if self.prev.pos[j] + k == rh.move_on[i]:
+                                return True
+
+                    if rh.move_on[j] == self.pos[i] - 1:
+                        for k in range(rh.length[j]):
+                            if self.prev.pos[j] + k == rh.move_on[i]:
+                                return True
+
+        return False
 
     # Fonction qui vérifie si l'auto bloquante est elle-même bloquée par 1 ou 2 autos ou roche en verticale
     # ou en horizontale.
