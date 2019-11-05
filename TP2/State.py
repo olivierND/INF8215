@@ -26,6 +26,8 @@ class State:
         # TODO
         self.rock = None
 
+        self.reasons = []
+
     """
     Constructeur d'un état à partir du mouvement (c,d)
     """
@@ -58,30 +60,53 @@ class State:
             return 1000
 
         if self.is_closer_to_exit():
-            score += 10
+            self.reasons.append("is_closer_to_exit +3")
+            score += 3
 
         if self.is_further_to_exit():
-            score -= 10
+            self.reasons.append("is_further_to_exit -3")
+            score -= 3
 
         for i in range(len(self.pos)):
+            # Compare le current au previous, si l'auto sort du chemin de l'auto rouge +5
+            # Si l'auto se met dans le chemin de l'auto rouge -5
             if not self.is_previous_in_red_cars_way(rh, i) and self.is_current_in_red_cars_way(rh, i):
-                score -= 5
+                self.reasons.append("gets in red cars way -2")
+                score -= 2
             elif self.is_previous_in_red_cars_way(rh, i) and not self.is_current_in_red_cars_way(rh, i):
-                score += 5
+                self.reasons.append("gets out of red cars way +2")
+                score += 2
 
+            # Si un camion est sur une colonne > a la position de l'auto rouge, le truck
+            # doit absolutment aller vers le bas pour pouvoir faire passer l'auto rouge
             if self.is_truck_getting_out_of_red_cars_way(rh, i):
-                score += 5
+                self.reasons.append("is_truck_getting_out_of_red_cars_way +2")
+                score += 2
             elif self.is_truck_getting_in_red_cars_way(rh, i):
-                score -= 5
+                self.reasons.append("is_truck_getting_in_red_cars_way -2")
+                score -= 2
 
             if not self.previous_blocks_car_thats_in_red_cars_way(rh, i) \
                     and self.current_blocks_car_thats_in_red_cars_way(rh, i):
-                score -= 5
+                self.reasons.append("blablabla -1")
+                score -= 1
             elif self.previous_blocks_car_thats_in_red_cars_way(rh, i) \
                     and not self.current_blocks_car_thats_in_red_cars_way(rh, i):
-                score += 5
+                self.reasons.append("blablabla +1")
+                score += 1
+
+            # if self.current_blocks_car_thats_in_red_cars_way(rh, i):
+            #     score += 1
+            # else:
+            #     score -= 1
 
         return score
+
+    def is_closer_to_exit(self):
+        return self.prev is not None and self.pos[0] > self.prev.pos[0]
+
+    def is_further_to_exit(self):
+        return self.prev is not None and self.pos[0] < self.prev.pos[0]
 
     def is_current_in_red_cars_way(self, rh, i):
         if not rh.horiz[i] and rh.move_on[i] > self.pos[0] + 1:
@@ -129,7 +154,7 @@ class State:
                             if self.prev.pos[j] + k == rh.move_on[i]:
                                 return True
 
-                    if rh.move_on[j] == self.pos[i] - 1:
+                    if rh.move_on[j] == self.prev.pos[i] - 1:
                         for k in range(rh.length[j]):
                             if self.prev.pos[j] + k == rh.move_on[i]:
                                 return True
@@ -174,12 +199,6 @@ class State:
             return 1
 
         return k
-
-    def is_closer_to_exit(self):
-        return self.prev is not None and self.pos[0] > self.prev.pos[0]
-
-    def is_further_to_exit(self):
-        return self.prev is not None and self.pos[0] < self.prev.pos[0]
 
     def success(self):
         return self.pos[0] == 4
