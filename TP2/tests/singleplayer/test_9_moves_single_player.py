@@ -8,7 +8,7 @@ rh = Rushhour([True, False, False, False, True],
                  [2, 4, 5, 1, 5],
                  ["rouge", "vert", "bleu", "orange", "jaune"])
 s = State([1, 0, 1, 3, 2])
-algo = MiniMaxSearch(rh, s,1)
+algo = MiniMaxSearch(rh, s, 1)
 algo.rushhour.init_positions(s)
 print(algo.rushhour.free_pos)
 algo.solve(s, True)

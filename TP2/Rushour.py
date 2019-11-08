@@ -29,13 +29,17 @@ class Rushhour:
         for i in range(self.nbcars):
             if self.horiz[i]:
                 if state.pos[i] + self.length[i] - 1 < 5 and self.free_pos[
-                    self.move_on[i], state.pos[i] + self.length[i]]:
+                    self.move_on[i],
+                    state.pos[i] + self.length[i]
+                ]:
                     new_states.append(state.move(i, +1))
                 if state.pos[i] > 0 and self.free_pos[self.move_on[i], state.pos[i] - 1]:
                     new_states.append(state.move(i, -1))
             else:
                 if state.pos[i] + self.length[i] - 1 < 5 and self.free_pos[
-                    state.pos[i] + self.length[i], self.move_on[i]]:
+                    state.pos[i] + self.length[i],
+                    self.move_on[i]
+                ]:
                     new_states.append(state.move(i, +1))
                 if state.pos[i] > 0 and self.free_pos[state.pos[i] - 1, self.move_on[i]]:
                     new_states.append(state.move(i, -1))
@@ -47,11 +51,13 @@ class Rushhour:
 
         for i in range(6):
             for j in range(6):
-                # S'il n'y a pas encore de rock, on ne vérifie pas la condition pour la ligne/colonne de la roche précédente
+                # S'il n'y a pas encore de rock,
+                # on ne vérifie pas la condition pour la ligne/colonne de la roche précédente
                 if state.rock is None and self.free_pos[i][j] and i != 2:
                     new_states.append(state.put_rock((i, j)))
                 # Si on a une roche précédente, on vérifie sont numéro de ligne et colonne
-                elif state.rock is not None and self.free_pos[i][j] and i != 2 and i != state.rock[0] and j != state.rock[1]:
+                elif state.rock is not None and self.free_pos[i][j] and i != 2 and i != state.rock[0] and j != \
+                        state.rock[1]:
                     new_states.append(state.put_rock((i, j)))
 
         return new_states

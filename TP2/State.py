@@ -50,57 +50,54 @@ class State:
         s.rock = rock_pos
         return s
 
-    # Si une auto bloque directement l'auto rouge: score -= 1
-    # Si une auto ou une roche bloque une auto qui elle bloque l'auto rouge : score -= 1
-    # Si une auto qui bloque l'auto rouge n'est pas bloquée par une autre auto ou roche : score += 1
     def score_state(self, rh):
-        score = 0
+        score = self.pos[0] * 10
 
         if self.success():
-            return 1000
+            score = 1000
 
-        if self.is_closer_to_exit():
-            self.reasons.append("is_closer_to_exit +3")
-            score += 3
+        for car in range(rh.nbcars):
+            # Si la voiture est verticale et devant la voiture rouge
+            if not rh.horiz[car] and rh.move_on[car] >= self.pos[0] + 1:
+                # Si la voiture bloque la voiture rouge (index 0)
+                if self.is_car_blocked(rh, 0, car):
+                    facteur = 10
+                    compteur = 0
+                    # Si la premiere voiture est bloquee par une deuxieme voiture
+                    for car2 in range(rh.nbcars):
+                        if self.is_car_blocked(rh, car, car2) and car != car2:
+                            # Si la voiture est bloquee, on augmente son facteur
+                            facteur = 100
+                            compteur += 1
 
-        if self.is_further_to_exit():
-            self.reasons.append("is_further_to_exit -3")
-            score -= 3
+                            # Si la deuxieme voiture est bloquee par des voitures
+                            compteur2 = 0
+                            for car3 in range(rh.nbcars):
+                                if self.is_car_blocked(rh, car2, car3) and car2 != car3:
+                                    # Si la deuxieme voiture est bloquee, on augmente son facteur
+                                    facteur = 1000
 
-        for i in range(len(self.pos)):
-            # Compare le current au previous, si l'auto sort du chemin de l'auto rouge +5
-            # Si l'auto se met dans le chemin de l'auto rouge -5
-            if not self.is_previous_in_red_cars_way(rh, i) and self.is_current_in_red_cars_way(rh, i):
-                self.reasons.append("gets in red cars way -2")
-                score -= 2
-            elif self.is_previous_in_red_cars_way(rh, i) and not self.is_current_in_red_cars_way(rh, i):
-                self.reasons.append("gets out of red cars way +2")
-                score += 2
-
-            # Si un camion est sur une colonne > a la position de l'auto rouge, le truck
-            # doit absolutment aller vers le bas pour pouvoir faire passer l'auto rouge
-            if self.is_truck_getting_out_of_red_cars_way(rh, i):
-                self.reasons.append("is_truck_getting_out_of_red_cars_way +2")
-                score += 2
-            elif self.is_truck_getting_in_red_cars_way(rh, i):
-                self.reasons.append("is_truck_getting_in_red_cars_way -2")
-                score -= 2
-
-            if not self.previous_blocks_car_thats_in_red_cars_way(rh, i) \
-                    and self.current_blocks_car_thats_in_red_cars_way(rh, i):
-                self.reasons.append("blablabla -1")
-                score -= 1
-            elif self.previous_blocks_car_thats_in_red_cars_way(rh, i) \
-                    and not self.current_blocks_car_thats_in_red_cars_way(rh, i):
-                self.reasons.append("blablabla +1")
-                score += 1
-
-            # if self.current_blocks_car_thats_in_red_cars_way(rh, i):
-            #     score += 1
-            # else:
-            #     score -= 1
+                        # Si la roche bloque cette voiture
+                        if self.rock and self.rock[1] == rh.move_on[car]:
+                            score -= facteur
+                        # On penalise moins car la voiture bloquante n'est pas elle-meme bloquee
+                        elif compteur == 0:
+                            score -= facteur
+                        # On penalise les voitures bloquantes par le nombre de voitures qui la bloque elle-meme
+                        elif compteur > 0:
+                            score -= compteur * facteur
 
         return score
+
+    def is_car_blocked(self, rh, blocked_car, car):
+        # Si les voitures sont horizontales et sur la meme ligne
+        if rh.horiz[car] == rh.horiz[blocked_car] and rh.move_on[car] == rh.move_on[blocked_car]:
+            return True;
+
+        # Si la voiture bloquante est verticale, bloque-t-elle la voiture rouge?
+        if rh.horiz[car] != rh.horiz[blocked_car]:
+            return self.pos[car] <= rh.move_on[blocked_car] < self.pos[car] + rh.length[car]
+        return False
 
     def is_closer_to_exit(self):
         return self.prev is not None and self.pos[0] > self.prev.pos[0]
@@ -188,12 +185,14 @@ class State:
         if rh.horiz[car_index]:
             # La roche est en arriere ou en avant de l'auto
             if (self.rock[0] == rh.move_on[car_index] and self.rock[1] == self.pos[car_index] - 1) \
-                or (self.rock[0] == rh.move_on[car_index] and self.rock[1] == self.pos[car_index] + rh.length[car_index]):
+                    or (self.rock[0] == rh.move_on[car_index] and self.rock[1] == self.pos[car_index] + rh.length[
+                car_index]):
                 k -= 1
         else:
             # La roche est a gauche ou a droite de l'auto
             if (self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] - 1) \
-                or (self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] + rh.length[car_index]):
+                    or (self.rock[1] == rh.move_on[car_index] and self.rock[0] == self.pos[car_index] + rh.length[
+                car_index]):
                 k -= 1
         if k == 0:
             return 1
