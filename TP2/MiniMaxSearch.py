@@ -82,6 +82,12 @@ class MiniMaxSearch:
 
         return move
 
+    def decide_best_move_2(self, is_max):
+        self.state = self.minimax_2(1, self.state, is_max)
+        self.rushhour.init_positions(self.state)
+        print("\n")
+        print(self.rushhour.free_pos)
+
     def minimax_pruning(self, current_depth, current_state, is_max, alpha, beta):
         if current_depth == self.search_depth:
             best_move = self.max(possible_moves)
@@ -142,10 +148,8 @@ class MiniMaxSearch:
         else:
             adversary = False
             while not self.state.success():
-                self.state = self.minimax_2(1, state, adversary)
+                self.decide_best_move_2(adversary)
                 adversary = not adversary
-                print("\n")
-                print(self.rushhour.free_pos)
 
     def print_move(self, is_max, state):
         i = 1
