@@ -56,6 +56,10 @@ class MiniMaxSearch:
         return min_state
 
     def minimax_2(self, current_depth, current_state, is_max):
+        # Lorsqu'on atteint notre search_depth on retourne le state
+        if current_depth == self.search_depth:
+            return current_state
+
         if is_max:
             # Coups possibles pour la roche
             possible_moves = self.rushhour.possible_rock_moves(current_state)
@@ -63,18 +67,18 @@ class MiniMaxSearch:
             # Coups possibles pour les autos
             possible_moves = self.rushhour.possible_moves(current_state)
 
-        # Lorsqu'on atteint notre search_depth, on retourne le state avec le meilleur score si
-        # is_max = true (auto), le state avec le pire score sinon (roche)
-        if current_depth == self.search_depth:
-            if is_max:
-                move = self.max(possible_moves)
-            else:
-                move = self.min(possible_moves)
-            return move
-
+        search_depth_moves = []
         # On rappel Minimax2 jusqu'à notre search_depth
         for s in possible_moves:
             move = self.minimax_2(current_depth + 1, s, is_max)
+            # On append tout les noeuds qui sont au search depth
+            search_depth_moves.append(move)
+
+        # On choisit le noeud ayant le meilleur ou pire score selon is_max
+        if is_max:
+            move = self.max(possible_moves)
+        else:
+            move = self.min(possible_moves)
 
         return move
 
@@ -136,10 +140,10 @@ class MiniMaxSearch:
                 self.state = self.minimax_1(1, self.state)
             self.print_move(False, self.state)
         else:
-            adversary = True
+            adversary = False
             while not self.state.success():
-                adversary = not adversary
                 self.state = self.minimax_2(1, state, adversary)
+                adversary = not adversary
                 print("\n")
                 print(self.rushhour.free_pos)
 
