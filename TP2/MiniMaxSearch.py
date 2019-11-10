@@ -74,15 +74,15 @@ class MiniMaxSearch:
             if s.success():
                 return s
 
-            move = self.minimax_2(current_depth + 1, s, is_max)
+            move = self.minimax_2(current_depth + 1, s, not is_max)
             # On append tout les noeuds qui sont au search depth
             search_depth_moves.append(move)
 
         # On choisit le noeud ayant le meilleur ou pire score selon is_max
         if is_max:
-            move = self.max(possible_moves)
+            move = self.max(search_depth_moves)
         else:
-            move = self.min(possible_moves)
+            move = self.min(search_depth_moves)
 
         return move
 
