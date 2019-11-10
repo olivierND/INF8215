@@ -11,11 +11,7 @@ class MiniMaxSearch:
         possible_moves = self.rushhour.possible_moves(current_state)
 
         if current_depth == self.search_depth:
-            print("\n")
-            print(str(current_state.reasons))
-            print("score" + str(current_state.score))
-            print(self.rushhour.free_pos)
-            best_move = self.get_best_state(possible_moves)
+            best_move = self.max(possible_moves)
             self.visited.add(best_move)
             best_move.score = best_move.score_state(self.rushhour)
             return best_move
@@ -25,8 +21,8 @@ class MiniMaxSearch:
 
         return best_move
 
-    def get_best_state(self, possible_moves):
-        best_state = None
+    def max(self, possible_moves):
+        max_state = None
         for s in possible_moves:
             s.score = s.score_state(self.rushhour)
 
@@ -35,31 +31,56 @@ class MiniMaxSearch:
                 s.reasons.append("Visited -3")
                 s.score -= 3
 
-            if best_state is None:
-                best_state = s
-            elif s.score > best_state.score:
-                best_state = s
+            if max_state is None:
+                max_state = s
+            elif s.score > max_state.score:
+                max_state = s
 
-        return best_state
+        return max_state
+
+    def min(self, possible_moves):
+        min_state = None
+        for s in possible_moves:
+            s.score = s.score_state(self.rushhour)
+
+            # Enleve des points au states qui sont déjà visited
+            if s in self.visited:
+                s.reasons.append("Visited -3")
+                s.score -= 3
+
+            if min_state is None:
+                min_state = s
+            elif s.score < min_state.score:
+                min_state = s
+
+        return min_state
 
     def minimax_2(self, current_depth, current_state, is_max):
         if is_max:
-            possible_moves = self.rushhour.possible_moves(current_state)
-        else:
+            # Coups possibles pour la roche
             possible_moves = self.rushhour.possible_rock_moves(current_state)
+        else:
+            # Coups possibles pour les autos
+            possible_moves = self.rushhour.possible_moves(current_state)
 
+        # Lorsqu'on atteint notre search_depth, on retourne le state avec le meilleur score si
+        # is_max = true (auto), le state avec le pire score sinon (roche)
         if current_depth == self.search_depth:
-            best_move = self.get_best_state(possible_moves)
-            return best_move
+            if is_max:
+                move = self.max(possible_moves)
+            else:
+                move = self.min(possible_moves)
+            return move
 
+        # On rappel Minimax2 jusqu'à notre search_depth
         for s in possible_moves:
-            best_move = self.minimax_1(current_depth + 1, s)
+            move = self.minimax_2(current_depth + 1, s, is_max)
 
-        return best_move
+        return move
 
     def minimax_pruning(self, current_depth, current_state, is_max, alpha, beta):
         if current_depth == self.search_depth:
-            best_move = self.get_best_state(possible_moves)
+            best_move = self.max(possible_moves)
             return best_move
 
         if is_max:
@@ -118,7 +139,9 @@ class MiniMaxSearch:
             adversary = True
             while not self.state.success():
                 adversary = not adversary
-                self.minimax_2(0, state, adversary)
+                self.state = self.minimax_2(1, state, adversary)
+                print("\n")
+                print(self.rushhour.free_pos)
 
     def print_move(self, is_max, state):
         i = 1
