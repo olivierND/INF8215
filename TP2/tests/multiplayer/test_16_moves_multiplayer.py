@@ -12,5 +12,4 @@ s = State([1, 0, 1, 4, 2, 4, 0, 1])
 algo = MiniMaxSearch(rh, s, 3)
 algo.rushhour.init_positions(s)
 print(algo.rushhour.free_pos)
-algo.solve(s, False)
-%time
+algo.solve(s, False, True)
