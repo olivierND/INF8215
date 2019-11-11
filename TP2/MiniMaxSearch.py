@@ -173,7 +173,7 @@ class MiniMaxSearch:
         else:
             return random.choice(possible_states)
 
-    def solve(self, state, is_singleplayer, is_pruning):
+    def solve(self, state, is_singleplayer, is_pruning, mode):
         if state.success():
             return state
 
@@ -186,8 +186,11 @@ class MiniMaxSearch:
             while not self.state.success():
                 if is_pruning:
                     self.state = self.minimax_pruning(0, self.state, adversary, float('-inf'), float('inf'))
+                elif mode is not None:
+                    self.state = self.expectimax(0, self.state, adversary, mode)
                 else:
                     self.state = self.minimax_2(0, self.state, adversary)
+
             self.print_move(self.state)
         return None
 
