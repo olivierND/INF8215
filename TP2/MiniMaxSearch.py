@@ -30,47 +30,55 @@ class MiniMaxSearch:
 
     def minimax_2(self, current_depth, current_state, is_max):
         if current_depth == self.search_depth:
-            current_state.score = current_state.score_state(self.rushhour)
             return current_state
 
-        score = float('-inf') if is_max else float('inf')
+        if is_max:
+            possible_moves = self.rushhour.possible_rock_moves(current_state)
+            score = float('-inf')
+        else:
+            possible_moves = self.rushhour.possible_moves(current_state)
+            score = float('inf')
+
         possible_states = []
-        possible_moves = self.rushhour.possible_rock_moves(current_state) if is_max else self.rushhour.possible_moves(
-            current_state)
 
         for s in possible_moves:
             if s.success() and current_depth != self.search_depth:
                 return s
 
             state = self.minimax_2(current_depth + 1, s, not is_max)
-            if is_max:
-                if state.score >= score:
-                    score = state.score
-                    s.score = score
-                    possible_states.append(s)
-            else:
-                if state.score <= score:
-                    score = state.score
-                    s.score = score
-                    possible_states.append(s)
+            state.score = state.score_state(self.rushhour)
+
+            if is_max and state.score >= score:
+                score = state.score
+                s.score = score
+                possible_states.append(s)
+            elif not is_max and state.score <= score:
+                score = state.score
+                s.score = score
+                possible_states.append(s)
 
         return random.choice([s for s in possible_states if s.score == score])
 
     def minimax_pruning(self, current_depth, current_state, is_max, alpha, beta):
         if current_depth == self.search_depth:
-            current_state.score = current_state.score_state(self.rushhour)
             return current_state
 
-        score = float('-inf') if is_max else float('inf')
+        if is_max:
+            possible_moves = self.rushhour.possible_rock_moves(current_state)
+            score = float('-inf')
+        else:
+            possible_moves = self.rushhour.possible_moves(current_state)
+            score = float('inf')
+
         possible_states = []
-        possible_moves = self.rushhour.possible_rock_moves(current_state) if is_max else self.rushhour.possible_moves(
-            current_state)
 
         for s in possible_moves:
             if s.success() and current_depth != self.search_depth:
                 return s
 
             state = self.minimax_pruning(current_depth + 1, s, not is_max, alpha, beta)
+            state.score = state.score_state(self.rushhour)
+
             if is_max:
                 if state.score >= score:
                     score = state.score
